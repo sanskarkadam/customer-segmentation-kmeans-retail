@@ -1,87 +1,60 @@
-# Customer Segmentation with K-Means (Retail Dataset)
+# Customer Segmentation with K-Means
 
-A beginner-friendly project that groups customers from the Mall Customers dataset by age, annual income, and spending score. It includes data checks, exploratory charts, K-Means evaluation, descriptive segment summaries, CSV exports, and a small Streamlit dashboard.
+A small Python project that groups customers from the Mall Customers dataset by age, annual income, and spending score. It includes exploratory charts, K-Means evaluation, segment summaries, and a Streamlit dashboard.
 
-## Project structure
+## Project files
 
 ```text
-customer-segmentation/
-├── data/Mall_Customers.csv
-├── outputs/                 # generated charts, summaries, and customer labels
-├── app.py
-├── main.py
+├── data/
+│   └── Mall_Customers.csv
+├── outputs/                 # charts and result files created by main.py
+├── app.py                   # Streamlit dashboard
+├── main.py                  # data checks and K-Means analysis
 ├── requirements.txt
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
-`main.py` performs the analysis and writes generated files to `outputs/`. `app.py` reads the saved labeled CSV, so run the analysis once before starting the dashboard.
+The source CSV is the publicly shared teaching dataset available in the [tirthajyoti Machine-Learning-with-Python repository](https://github.com/tirthajyoti/Machine-Learning-with-Python/blob/master/Datasets/Mall_Customers.csv). It contains 200 records and the columns `CustomerID`, `Gender`, `Age`, `Annual Income (k$)`, and `Spending Score (1-100)`. The project uses the real CSV and does not generate replacement data.
 
-## Dataset
+## Run on Windows
 
-The included `data/Mall_Customers.csv` is the publicly shared Mall Customers teaching dataset. It contains `CustomerID`, `Gender`, `Age`, `Annual Income (k$)`, and `Spending Score (1-100)`. The copy used here is available in the [tirthajyoti Machine-Learning-with-Python repository](https://github.com/tirthajyoti/Machine-Learning-with-Python/blob/master/Datasets/Mall_Customers.csv). If the file is missing, download the CSV from that page and save it at `data/Mall_Customers.csv`. The project does not create substitute or synthetic customer records.
+Open Command Prompt in this folder and enter each command separately:
 
-## Setup
-
-From the project folder, create and activate a virtual environment:
-
-```powershell
+```cmd
 python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-If PowerShell blocks activation, you can use the environment's Python directly with `.venv\Scripts\python.exe`.
-
-## Run the analysis
-
-```powershell
+call .venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
 python main.py
 ```
 
-The program prints a data overview and selected K, then saves:
+To open the dashboard after the analysis completes:
 
-- `outputs/eda_overview.png`: distributions, income/spending scatter, gender counts, and numeric correlation heatmap.
-- `outputs/cluster_selection.png`: inertia curve and silhouette scores for candidate K values.
-- `outputs/customer_segments.png`: colored customer groups and their centers on the income/spending axes.
-- `outputs/customers_with_clusters.csv`: original customer records with `Cluster` and descriptive `Segment` columns.
-- `outputs/segment_summary.csv`: customer count and average age, income, and spending score for each cluster.
-- `outputs/analysis_results.json`: the K-selection values used in the run.
-
-## Run the dashboard
-
-After `main.py` succeeds, run:
-
-```powershell
+```cmd
 streamlit run app.py
 ```
 
-Use the segment filter to explore groups. The table can be downloaded as CSV. Recommendations are starting points for experiments; validate them with campaign results.
+The browser address will appear in the terminal, usually `http://localhost:8501`. In PowerShell, activate the environment with `.venv\Scripts\Activate.ps1` instead of the `call` command.
 
-## Deploy on Streamlit Community Cloud
+If you move the project to another folder, recreate the virtual environment there. Windows virtual environments can refer to their original folder. For example:
 
-1. Push this project to a GitHub repository. Include the `data/Mall_Customers.csv` file and `requirements.txt`; do not upload `.venv`.
-2. Open [Streamlit Community Cloud](https://share.streamlit.io/) and connect your GitHub account.
-3. Choose **Create app**, select the repository and branch, and set the app file to `app.py`. In advanced settings, select Python 3.13 to match the development environment.
-4. Deploy. On its first launch, the app runs `main.py` to create the cluster results if they are not already present.
+```cmd
+python -m venv --clear .venv
+call .venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+```
 
-The repository and deployed dashboard are public. Do not add private data or credentials to the project.
+## What the analysis does
 
-## How the analysis works
+1. Loads the CSV and shows its first rows, shape, columns, data types, missing values, and duplicate count.
+2. Removes exact duplicate rows and fills missing values in the clustering features with their column median.
+3. Keeps `CustomerID` for identifying customers but leaves it out of clustering. The features are age, annual income, and spending score.
+4. Scales those features with `StandardScaler`. K-Means compares distances, so scaling keeps a feature with larger numbers from dominating the result just because of its units.
+5. Compares K values from 1 to 10 using inertia and from 2 to 10 using silhouette score. The script selects the K with the highest silhouette score as a starting point; the elbow curve and usefulness of the groups should also be considered.
+6. Fits K-Means with `random_state=42` and `n_init=10`, adds the resulting labels, and summarizes each group.
 
-1. Pandas loads the CSV and reports its first rows, shape, columns, types, missing values, and duplicate rows. Exact duplicate rows are removed. Missing numeric feature values, if any, are filled with their column median.
-2. `CustomerID` is retained for identifying records but left out of clustering because an identifier does not describe shopping behaviour. The clustering uses age, annual income, and spending score.
-3. `StandardScaler` puts these features on comparable scales. K-Means uses distances, so a feature with a larger numeric range could otherwise dominate the grouping.
-4. The Elbow Method plots inertia for K from 1 to 10 (or fewer when the dataset is small). Inertia always falls as K increases, so look for where its drop starts to slow. Silhouette scores are computed for K from 2 to 10; higher scores indicate better separation in this feature space. The script uses the highest silhouette score as a reproducible starting choice. In a real analysis, inspect both plots and whether the groups are useful and understandable before settling on K.
-5. K-Means is fitted with `random_state=42` and `n_init=10`. The cluster labels are attached to a copy of the cleaned dataset and exported.
-6. Segment names are assigned from each cluster's average income and spending score relative to the cluster averages' medians. They describe observed patterns only. The clusters cannot establish customer motivations or predict future purchases.
+## Results from the included CSV
 
-The segment chart displays income and spending score in two dimensions, while clustering uses three features including age. It is a helpful view, but overlapping points on this chart can still differ by age and their three-dimensional distances.
-
-## Results from the included dataset
-
-The included CSV has 200 rows and no missing values or exact duplicate rows. With the current code and `random_state=42`, the best silhouette score among the tested values was at K=6 (about 0.428). The script chooses K by that score as a starting point; the elbow chart and practical usefulness should still be considered.
+The included file has 200 customers, no missing values, and no exact duplicate rows. With the current code, the highest silhouette score in the tested range is **0.4284 at K=6**. The script uses six clusters for this dataset. A silhouette score is a comparison aid, not proof that these are the only useful groups.
 
 | Segment description | Customers | Average age | Average income (k$) | Average spending score |
 |---|---:|---:|---:|---:|
@@ -92,33 +65,51 @@ The included CSV has 200 rows and no missing values or exact duplicate rows. Wit
 | Lower-income, higher-spending | 23 | 25.0 | 25.3 | 77.6 |
 | Lower-income, lower-spending | 21 | 45.5 | 26.3 | 19.4 |
 
-Names can repeat because clusters are named from income and spending levels, while age can further separate customers into different clusters. For example, the two high-income/lower-spending groups differ in their average income, spending score, and age. A business could test loyalty offers with the high-income/high-spending group, and test value-focused promotions with lower-income/lower-spending customers. These are hypotheses from summary data, not claims about individual motives; campaign response should be measured.
+Some names repeat because names describe broad income and spending levels, while age can still split those customers into separate clusters. The groups describe observed patterns; they do not establish why someone shops or predict what they will buy.
 
-## Reading the charts
+## Files created by `main.py`
 
-- The three histograms show how age, income, and spending score are distributed.
-- The income-versus-spending chart helps reveal broad customer patterns, optionally separated by gender.
-- The gender chart shows the row count by gender; it does not imply gender causes a spending pattern.
-- The correlation heatmap summarizes linear relationships between numeric columns. Customer ID is present in the heatmap but should not be interpreted as a meaningful customer characteristic.
-- The segment plot and summary table show how the selected groups differ on the measured features.
+- `outputs/eda_overview.png`: feature distributions, income versus spending, gender counts, and a numeric correlation heatmap.
+- `outputs/cluster_selection.png`: the elbow curve and silhouette scores.
+- `outputs/customer_segments.png`: customer groups on the income and spending axes, with group centers.
+- `outputs/customers_with_clusters.csv`: customer records with `Cluster` and `Segment` labels.
+- `outputs/segment_summary.csv`: group counts and average age, income, and spending score.
+- `outputs/analysis_results.json`: K-selection values from the run.
+
+The two-dimensional segment chart shows income and spending only. Age is also used by K-Means, so the chart cannot show every difference between groups.
+
+## Streamlit dashboard
+
+Run `streamlit run app.py` after `main.py`. The dashboard has customer counts and group averages, a segment filter, an interactive scatter plot, business suggestions, and a CSV download. If the generated cluster file is missing, the app runs `main.py` on startup to create it.
+
+## Deploy on Streamlit Community Cloud
+
+This project is in the public repository [sanskarkadam/customer-segmentation-kmeans-retail](https://github.com/sanskarkadam/customer-segmentation-kmeans-retail). To deploy it:
+
+1. Sign in at [Streamlit Community Cloud](https://share.streamlit.io/) with GitHub.
+2. Choose **Create app** and select repository `sanskarkadam/customer-segmentation-kmeans-retail`.
+3. Select branch `main` and app file `app.py`.
+4. In **Advanced settings**, select Python 3.13, then choose **Deploy**.
+
+The repository and deployed app are public. The dataset is included; do not add private data or credentials. Community Cloud installs the packages listed in `requirements.txt`.
 
 ## Limitations
 
-This is a small, commonly used teaching dataset, not a full transaction history. Its spending score is supplied by the dataset and is not a direct measure of future revenue. K-Means favors roughly compact groups, depends on the chosen features and K, and can change when data or preprocessing changes. Use the results to form testable marketing hypotheses, not as proof of why a person buys or what they will do next.
+This is a small teaching dataset, not a complete transaction history. The supplied spending score is not the same as actual revenue or a forecast. K-Means depends on the features, scaling, and chosen K, and tends to favor compact groups. Treat suggested marketing actions as ideas to test and measure, not conclusions about individual customers.
 
 ## Short project summary
 
-This project applies K-Means clustering to group Mall Customers using age, annual income, and spending score. It checks and scales the data, compares cluster counts with inertia and silhouette score, visualizes the resulting groups, and exports cluster labels and summary statistics. A Streamlit dashboard makes the results easier to explore and download.
+This project uses K-Means to group 200 Mall Customers by age, annual income, and spending score. It checks and scales the data, compares candidate cluster counts with inertia and silhouette score, visualizes six groups, and exports customer labels and group statistics. A Streamlit dashboard lets users explore and download the results.
 
-## Viva questions and simple answers
+## Viva questions
 
-1. **What is clustering?** It is an unsupervised learning task that groups records by similarity without pre-existing target labels.
-2. **How does K-Means work?** It assigns each record to a nearby center, recalculates centers as group averages, and repeats until assignments settle.
-3. **Why scale the features?** K-Means uses distances, so scaling prevents a feature's larger units or range from overwhelming the others.
-4. **Why exclude CustomerID?** It is an identifier rather than a measure of customer behaviour, so its numeric value would add meaningless distance.
-5. **What does inertia measure?** The total squared distance between records and their assigned cluster centers; lower values mean tighter groups, but inertia decreases as K grows.
-6. **What is the Elbow Method?** It plots inertia across K and looks for a bend where adding more groups gives smaller improvements.
-7. **What does silhouette score tell us?** It compares how close a record is to its own group against other groups; higher average scores generally suggest better-separated clusters.
-8. **Why not choose K from one score alone?** A score is one guide; interpretability, the elbow curve, and whether groups help the business also matter.
-9. **What is a limitation of the cluster scatter plot?** It shows income and spending only, while this project's clustering also includes age.
-10. **How can a business use these segments?** It can design small, measurable campaign tests for different observed groups and evaluate the results.
+1. **What is clustering?** An unsupervised learning method that groups similar records without known target labels.
+2. **How does K-Means work?** It assigns records to nearby centers, recalculates each center as the group average, and repeats.
+3. **Why scale the features?** K-Means uses distances, so scaling prevents a feature's larger numeric range from dominating.
+4. **Why leave out `CustomerID`?** It identifies a record but does not describe customer behaviour.
+5. **What is inertia?** The sum of squared distances from records to their assigned cluster centers.
+6. **What is the Elbow Method?** A plot of inertia across K values; a bend can show where extra clusters bring smaller gains.
+7. **What does silhouette score measure?** How well each record fits its own group compared with nearby groups; higher average scores often mean clearer separation.
+8. **Why not choose K using only silhouette score?** Interpretability and the elbow curve also matter; the largest score does not guarantee the most useful groups.
+9. **What does the segment chart leave out?** It shows income and spending, but clustering also uses age.
+10. **How might a retailer use the groups?** To try different promotions with different groups and measure the results.
