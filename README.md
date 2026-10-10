@@ -16,33 +16,6 @@ A small Python project that groups customers from the Mall Customers dataset by 
 
 The source CSV is the publicly shared teaching dataset available in the [tirthajyoti Machine-Learning-with-Python repository](https://github.com/tirthajyoti/Machine-Learning-with-Python/blob/master/Datasets/Mall_Customers.csv). It contains 200 records and the columns `CustomerID`, `Gender`, `Age`, `Annual Income (k$)`, and `Spending Score (1-100)`. The project uses the real CSV and does not generate replacement data.
 
-## Run on Windows
-
-Open Command Prompt in this folder and enter each command separately:
-
-```cmd
-python -m venv .venv
-call .venv\Scripts\activate.bat
-python -m pip install -r requirements.txt
-python main.py
-```
-
-To open the dashboard after the analysis completes:
-
-```cmd
-streamlit run app.py
-```
-
-The browser address will appear in the terminal, usually `http://localhost:8501`. In PowerShell, activate the environment with `.venv\Scripts\Activate.ps1` instead of the `call` command.
-
-If you move the project to another folder, recreate the virtual environment there. Windows virtual environments can refer to their original folder. For example:
-
-```cmd
-python -m venv --clear .venv
-call .venv\Scripts\activate.bat
-python -m pip install -r requirements.txt
-```
-
 ## What the analysis does
 
 1. Loads the CSV and shows its first rows, shape, columns, data types, missing values, and duplicate count.
@@ -81,17 +54,6 @@ The two-dimensional segment chart shows income and spending only. Age is also us
 ## Streamlit dashboard
 
 Run `streamlit run app.py` after `main.py`. The dashboard has customer counts and group averages, a segment filter, an interactive scatter plot, business suggestions, and a CSV download. If the generated cluster file is missing, the app runs `main.py` on startup to create it.
-
-## Deploy on Streamlit Community Cloud
-
-This project is in the public repository [sanskarkadam/customer-segmentation-kmeans-retail](https://github.com/sanskarkadam/customer-segmentation-kmeans-retail). To deploy it:
-
-1. Sign in at [Streamlit Community Cloud](https://share.streamlit.io/) with GitHub.
-2. Choose **Create app** and select repository `sanskarkadam/customer-segmentation-kmeans-retail`.
-3. Select branch `main` and app file `app.py`.
-4. In **Advanced settings**, select Python 3.13, then choose **Deploy**.
-
-The repository and deployed app are public. The dataset is included; do not add private data or credentials. Community Cloud installs the packages listed in `requirements.txt`.
 
 ## Limitations
 
