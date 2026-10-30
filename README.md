@@ -62,16 +62,3 @@ This is a small teaching dataset, not a complete transaction history. The suppli
 ## Short project summary
 
 This project uses K-Means to group 200 Mall Customers by age, annual income, and spending score. It checks and scales the data, compares candidate cluster counts with inertia and silhouette score, visualizes six groups, and exports customer labels and group statistics. A Streamlit dashboard lets users explore and download the results.
-
-## Viva questions
-
-1. **What is clustering?** An unsupervised learning method that groups similar records without known target labels.
-2. **How does K-Means work?** It assigns records to nearby centers, recalculates each center as the group average, and repeats.
-3. **Why scale the features?** K-Means uses distances, so scaling prevents a feature's larger numeric range from dominating.
-4. **Why leave out `CustomerID`?** It identifies a record but does not describe customer behaviour.
-5. **What is inertia?** The sum of squared distances from records to their assigned cluster centers.
-6. **What is the Elbow Method?** A plot of inertia across K values; a bend can show where extra clusters bring smaller gains.
-7. **What does silhouette score measure?** How well each record fits its own group compared with nearby groups; higher average scores often mean clearer separation.
-8. **Why not choose K using only silhouette score?** Interpretability and the elbow curve also matter; the largest score does not guarantee the most useful groups.
-9. **What does the segment chart leave out?** It shows income and spending, but clustering also uses age.
-10. **How might a retailer use the groups?** To try different promotions with different groups and measure the results.
